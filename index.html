@@ -1,13 +1,49 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Slingshot Game</title>
-    <script src="https://cdn.jsdelivr.net/npm/phaser@3.55.2/dist/phaser.min.js"></script>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Fractal Generator</title>
+  <style>
+    canvas { display: block; margin: auto; }
+    #controls { text-align: center; margin-top: 10px; }
+  </style>
 </head>
 <body>
-    <div id="game-container"></div>
-    <script src="game.js"></script>
+  <canvas id="fractalCanvas" width="800" height="600"></canvas>
+  <div id="controls">
+    <label>Angle: <input type="range" id="angle" min="0" max="90" value="30"></label>
+    <label>Iterations: <input type="number" id="iterations" min="1" max="10" value="5"></label>
+    <button onclick="drawFractal()">Generate</button>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('fractalCanvas');
+    const ctx = canvas.getContext('2d');
+
+    function drawFractal(angle = 30, iterations = 5, x = canvas.width / 2, y = canvas.height, length = 100) {
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+      function drawBranch(x, y, length, angle, depth) {
+        if (depth === 0) return;
+        const rad = angle * Math.PI / 180;
+        const x1 = x + length * Math.cos(rad);
+        const y1 = y - length * Math.sin(rad);
+
+        ctx.beginPath();
+        ctx.moveTo(x, y);
+        ctx.lineTo(x1, y1);
+        ctx.stroke();
+
+        drawBranch(x1, y1, length * 0.7, angle - document.getElementById('angle').valueAsNumber, depth - 1);
+        drawBranch(x1, y1, length * 0.7, angle + document.getElementById('angle').valueAsNumber, depth - 1);
+      }
+
+      drawBranch(x, y, length, -90, iterations);
+    }
+
+    document.getElementById('angle').addEventListener('input', () => drawFractal());
+    document.getElementById('iterations').addEventListener('input', () => drawFractal());
+    drawFractal();
+  </script>
 </body>
 </html>
